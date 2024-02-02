@@ -6,9 +6,10 @@ import {
   MessageInput,
   MessageSeparator,
 } from "@chatscope/chat-ui-kit-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageModel } from "@chatscope/chat-ui-kit-react/src/types";
 import { ILanguage } from "../../data/language";
+import { IChatAgent } from "../../constants/interfaces/IChatAgent";
 
 interface IConversation {
   message: ILanguage;
@@ -18,33 +19,48 @@ const Conversation = ({ message }: IConversation) => {
   const [inputMessage, setInputMessage] = useState("");
   const [messageList, setListMessage] = useState([] as MessageModel[]);
 
-  const [currentChat, setCurrentChat] = useState("");
+  const [chatAgent, setChatAgent] = useState({} as IChatAgent);
 
-  const initChat = () => {
-    setCurrentChat(Math.random().toString(36).substring(7));
+  const initChatAgent = () => {
+    setChatAgent({
+      agent: {
+        key: "agent",
+        name: "Agent",
+      },
+      chatUid: Math.random().toString(36).substring(7),
+    });
+
+    setTimeout(() => {
+      setListMessage([{ direction: "incoming", position: "single", payload: "Welcome!" }]);
+    }, 1000);
+  }
+
+  const handleReceiveMessage = (actualList: MessageModel[]) => {
+    const nextList = [...actualList, { direction: "incoming", position: "single", payload: "Sorry. I can't answer your message right now." }] as MessageModel[];
+
+    setListMessage(nextList);
   }
 
   const handleSendMessage = () => {
-    if (!currentChat) initChat();
-
     const nextList = [...messageList, { direction: "outgoing", position: "single", payload: inputMessage }] as MessageModel[];
 
     setListMessage(nextList);
 
     setInputMessage("");
 
-    setTimeout(() => {
-      setListMessage([...nextList, { direction: "incoming", position: "single", payload: "pong" }]);
-    }, 1000);
+    handleReceiveMessage(nextList);
   }
+
+  useEffect(() => {
+    initChatAgent();
+  }, []);
 
   return (
     <MainContainer>
       <ChatContainer style={{ height: "300px" }}>
-
         <MessageList>
           {
-            currentChat && <MessageSeparator content={`ChatID ${currentChat}`} as="div" />
+            chatAgent.chatUid && <MessageSeparator content={`Chat ${chatAgent.chatUid}`} as="div" />
           }
 
           {
