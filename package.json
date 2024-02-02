@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.22.11",
+    "@chatscope/chat-ui-kit-react": "^1.10.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.6",
@@ -45,9 +46,11 @@
     "css-loader": "^6.8.1",
     "dotenv": "^16.3.1",
     "html-webpack-plugin": "^5.5.3",
+    "sass": "^1.70.0",
+    "sass-loader": "^14.1.0",
     "style-loader": "^3.3.3",
     "typescript": "^5.2.2",
-    "webpack": "^5.88.2",
+    "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
     "webpack-merge": "^5.9.0"
