@@ -5,21 +5,24 @@ import {
   Message,
   MessageInput,
   MessageSeparator,
+  Loader,
 } from "@chatscope/chat-ui-kit-react";
 import { useEffect, useState } from "react";
 import { MessageModel } from "@chatscope/chat-ui-kit-react/src/types";
 import { ILanguage } from "../../data/language";
 import { IChatAgent } from "../../constants/interfaces/IChatAgent";
+import ChatLoader from "../../components/ChatLoader";
 
 interface IConversation {
   message: ILanguage;
+  chatAgent: IChatAgent;
+  setChatAgent: (chatAgent: IChatAgent) => void;
 }
 
-const Conversation = ({ message }: IConversation) => {
+const Conversation = ({ message, chatAgent, setChatAgent }: IConversation) => {
   const [inputMessage, setInputMessage] = useState("");
-  const [messageList, setListMessage] = useState([] as MessageModel[]);
 
-  const [chatAgent, setChatAgent] = useState({} as IChatAgent);
+  const [messageList, setListMessage] = useState([] as MessageModel[]);
 
   const initChatAgent = () => {
     setChatAgent({
@@ -51,38 +54,50 @@ const Conversation = ({ message }: IConversation) => {
     handleReceiveMessage(nextList);
   }
 
+  const checkChatAgentIsReady = () => {
+    return !chatAgent.agent && !chatAgent.chatUid;
+  }
+
   useEffect(() => {
-    initChatAgent();
+    setTimeout(() => {
+      if (checkChatAgentIsReady()) {
+        initChatAgent();
+      }
+    }, 2000);
   }, []);
 
   return (
     <MainContainer>
-      <ChatContainer style={{ height: "300px" }}>
-        <MessageList>
-          {
-            chatAgent.chatUid && <MessageSeparator content={`Chat ${chatAgent.chatUid}`} as="div" />
-          }
+      {
+        checkChatAgentIsReady() ? <ChatLoader /> :
+          <ChatContainer style={{ height: "300px" }}>
+            <MessageList>
+              {
+                chatAgent.chatUid && <MessageSeparator content={`Chat ${chatAgent.chatUid}`} as="div" />
+              }
 
-          {
-            messageList.map((msg, index) => {
-              return <Message
-                key={index}
-                model={{
-                  direction: msg.direction,
-                  position: msg.position,
-                  payload: msg.payload,
-                }}
-              />
-            })
-          }
-        </MessageList>
-        <MessageInput
-          placeholder={message.inputPlaceholder}
-          onChange={(e) => { setInputMessage(e) }}
-          onSend={() => { handleSendMessage() }}
-          attachButton={false}
-        />
-      </ChatContainer>
+              {
+                messageList.map((msg, index) => {
+                  return <Message
+                    key={index}
+                    model={{
+                      direction: msg.direction,
+                      position: msg.position,
+                      payload: msg.payload,
+                    }}
+                  />
+                })
+              }
+            </MessageList>
+            <MessageInput
+              placeholder={message.inputPlaceholder}
+              onChange={(e) => { setInputMessage(e) }}
+              onSend={() => { handleSendMessage() }}
+              attachButton={false}
+            />
+          </ChatContainer>
+      }
+
     </MainContainer>)
 };
 
